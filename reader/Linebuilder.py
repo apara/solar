@@ -29,19 +29,6 @@ class LineBuilder130(LineBuilder):
         return Line130(array) if self.can_build(array[0]) else emptyLine
 
 
-class TestLineBuilder130(unittest.TestCase):
-
-    def test_build_130(self):
-        builder : LineBuilder = LineBuilder130()
-        result = builder.build(['130', 'foo'])
-        self.assertIsNot(result, emptyLine, 'result must not be an emptyLine')
-
-    def test_build_not_130(self):
-        builder : LineBuilder = LineBuilder130()
-        result = builder.build(['120', 'foo'])
-        self.assertIs(result, emptyLine, 'result must be emptyLine')
-
-
 class LineBuilder140(LineBuilder):
     KEY = '140'
 
@@ -66,18 +53,21 @@ class LineFactory:
         #
         array = value.split()
 
-        # For each builder try to create a line
+        # If there is anything in array
         #
-        for builder in self.__builders:
-
-            # Attempt to build a line
+        if array:
+            # For each builder try to create a line
             #
-            result = builder.build(array)
+            for builder in self.__builders:
 
-            # If we have a line, then break out of the loop
-            #
-            if result is not emptyLine:
-                break
+                # Attempt to build a line
+                #
+                result = builder.build(array)
+
+                # If we have a line, then break out of the loop
+                #
+                if result is not emptyLine:
+                    break
 
         # Log lines we could not parse
         #
@@ -114,8 +104,4 @@ class LinesFactory:
 
         # Return the lines we have built
         #
-        return lines
-
-if __name__ == '__main__':
-    unittest.main()
-
+        return result

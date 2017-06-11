@@ -1,6 +1,7 @@
 import unittest
-from reader.Linebuilder import LinesFactory, LineFactory, LineBuilder130, LineBuilder140
-from reader.Line import *
+
+from reader.line import *
+from reader.line_builder import LinesFactory, LineFactory, LineBuilder130, LineBuilder140
 
 
 class TestLineBuilder130(unittest.TestCase):
@@ -45,13 +46,17 @@ class TestLinesFactory(unittest.TestCase):
     __DATA = \
         '130\tfoo\n' \
         '140\tfoo\n' \
-        '150\tfoo\n' 
-
+        '150\tfoo\n'
+            
     def test_lines_builder(self):
         factory = LinesFactory()
         result = factory.build(self.__DATA)
         self.assertEqual(len(result), 2)
 
+        with open ("tests/test_line_builder.txt", "r") as file:
+            data = file.read()
+            result = factory.build(data)
+            self.assertEqual(len(result), 22)
 
 if __name__ == '__main__':
     unittest.main()

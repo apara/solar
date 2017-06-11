@@ -1,6 +1,6 @@
 import logging
-import unittest
-from reader.Line import *
+
+from reader import Line, emptyLine, Line130, Line140
 
 
 class LineBuilder:

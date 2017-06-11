@@ -26,7 +26,7 @@ class LineBuilder130(LineBuilder):
         super().__init__(self.KEY)
 
     def build(self, array) -> Line:
-        return Line130(array) if self.can_build(array[0]) else emptyLine
+        return Line130(None, array) if self.can_build(array[0]) else emptyLine
 
 
 class LineBuilder140(LineBuilder):
@@ -36,7 +36,7 @@ class LineBuilder140(LineBuilder):
         super().__init__(self.KEY)
 
     def build(self, array) -> Line:
-        return Line140(array) if self.can_build(array[0]) else emptyLine
+        return Line140(None, array) if self.can_build(array[0]) else emptyLine
 
 
 class LineFactory:

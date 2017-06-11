@@ -53,11 +53,9 @@ class TestLinesFactory(unittest.TestCase):
         result = factory.build(self.__DATA)
         self.assertEqual(len(result), 2)
 
-        with open ("tests/test_line_builder.txt", "r") as file:
+        with open("tests/test_line_builder.txt", "r") as file:
             data = file.read()
             result = factory.build(data)
             self.assertEqual(len(result), 22)
 
-if __name__ == '__main__':
-    unittest.main()
 

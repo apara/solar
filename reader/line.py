@@ -20,16 +20,20 @@ class Line:
         if array:
             self.type = array[0]
             self.ts = self.parse_date(array[1])
+            self.serial = array[2]
+            self.description = array[3]
 
     def __str__(self) -> str:
         return \
             super().__str__() + \
             ' id: ' + (self.id if self.id else 'None') + \
             ' type: ' + (self.type if self.type else 'None') + \
-            ' ts: ' + self.ts.__str__()
+            ' ts: ' + self.ts.__str__() + \
+            ' serial: ' + self.serial + \
+            ' description: ' + self.description
 
     @staticmethod
-    def parse_date(value:str)->datetime:
+    def parse_date(value: str)->datetime:
         return datetime.strptime(value, '%Y%m%d%H%M%S')
 
 

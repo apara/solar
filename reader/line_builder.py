@@ -47,7 +47,7 @@ class LineFactory:
     def build(self, value: str) -> Line:
         # Define empty result
         #
-        result: Line = emptyLine
+        result = emptyLine
 
         # Split the line into parts
         #

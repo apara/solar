@@ -40,6 +40,13 @@ class Configuration:
     def collector_ip_address(self):
         return self['collector_ip_address']
 
+    # Return the network interface that we are going to monitor
+    #
+    @property
+    def network_interface(self):
+        return self['network_interface']
+
+
     def __getitem__(self, property_name):
         # Get the value
         #

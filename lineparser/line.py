@@ -8,12 +8,20 @@ class LineId(str):
 
 # Line base class
 #
+def print_array(array):
+    pass
+
+
 class Line:
 
     def __init__(self, lid=None, array=None):
         # Assign id of the line
         #
         self.id = lid
+
+        # Print out the contents of the array
+        #
+        print(array)
 
         # Assign type of the line
         #

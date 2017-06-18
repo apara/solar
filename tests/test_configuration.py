@@ -8,6 +8,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual('A', configuration['propertyA'])
         self.assertEqual('B', configuration['propertyB'])
         self.assertEqual('204.194.111.66', configuration.collector_ip_address)
+        self.assertEqual('eth0', configuration.network_interface)
 
         try:
             configuration['invalidProperty']

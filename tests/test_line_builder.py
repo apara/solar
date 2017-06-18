@@ -1,7 +1,7 @@
 import unittest
 
-from reader.line import *
-from reader.line_builder import LinesFactory, LineFactory, LineBuilder130, LineBuilder140
+from lineparser.line import *
+from lineparser.line_builder import LinesFactory, LineFactory, LineBuilder130, LineBuilder140
 
 data_130 = '130	20170607165000	414051708000326	AC_Module_Type_C		2.6567	0.1372	250.4849	0.6821	0.1425	56.1571	2.8915	32	60.0186	0'
 data_array_130 = data_130.split()
@@ -15,22 +15,22 @@ class TestLineBuilder130(unittest.TestCase):
 
     def test_build(self):
         result = LineBuilder130().build(data_array_130)
-        self.assertIsNot(result, emptyLine, 'result must not be an emptyLine')
+        self.assertIsNot(result, empty_line, 'result must not be an emptyLine')
 
     def test_build_not(self):
         result = LineBuilder130().build(data_array_invalid)
-        self.assertIs(result, emptyLine, 'result must be emptyLine')
+        self.assertIs(result, empty_line, 'result must be emptyLine')
 
 
 class TestLineBuilder140(unittest.TestCase):
 
     def test_build(self):
         result = LineBuilder140().build(data_array_140)
-        self.assertIsNot(result, emptyLine, 'result must not be an emptyLine')
+        self.assertIsNot(result, empty_line, 'result must not be an emptyLine')
 
     def test_build_not(self):
         result = LineBuilder140().build(data_array_invalid)
-        self.assertIs(result, emptyLine, 'result must be emptyLine')
+        self.assertIs(result, empty_line, 'result must be emptyLine')
 
 
 class TestLineFactory(unittest.TestCase):
@@ -45,7 +45,7 @@ class TestLineFactory(unittest.TestCase):
         self.assertIsInstance(result, Line140)
 
         result = factory.build(data_invalid)
-        self.assertEqual(result, emptyLine)
+        self.assertEqual(result, empty_line)
 
 
 class TestLinesFactory(unittest.TestCase):

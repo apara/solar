@@ -9,6 +9,7 @@ class LineId(str):
 # Line base class
 #
 class Line:
+
     def __init__(self, lid=None, array=None):
         # Assign id of the line
         #
@@ -37,7 +38,7 @@ class Line:
         return datetime.strptime(value, '%Y%m%d%H%M%S')
 
 
-emptyLine = Line()
+empty_line = Line()
 
 
 # Type 130

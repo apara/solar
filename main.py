@@ -42,25 +42,30 @@ class DataCapture:
         tcp = ip.child()
         data = tcp.get_data_as_string()
 
-        print("DATA (%i): [%s]" % (len(data), data))
+        # print("DATA (%i): [%s]" % (len(data), data))
 
         # If this is a blank line, then we got the entire request
         #
         if len(data) == 0:
-            print("PROCESSING BUFFER (%i): [%s]" % (len(self.__buffer), self.__buffer))
-
-            # Create lines for results
+            # if there is anything in the buffer, then process it, otherwise nothing to see here
             #
-            results = self.__lines_factory.build(self.__buffer)
+            if len(self.__buffer) > 0:
+                print("PROCESSING (%i): [%s]" % (len(self.__buffer), self.__buffer))
 
-            # Clear out the buffer
-            #
-            self.__buffer = ''
+                # Create lines for results
+                #
+                results = self.__lines_factory.build(self.__buffer)
 
-            # Dump some debug for now
-            #
-            for l in results:
-                print(l)
+                # Clear out the buffer
+                #
+                self.__buffer = ''
+
+                # Dump some debug for now
+                #
+                for l in results:
+                    print(l)
+            else:
+                pass
         else:
             # Otherwise, append this data to the buffer
             #

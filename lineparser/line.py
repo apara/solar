@@ -21,7 +21,7 @@ class Line:
 
         # Print out the contents of the array
         #
-        print(array)
+        # print(array)
 
         # Assign type of the line
         #

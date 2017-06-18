@@ -79,8 +79,9 @@ class LineFactory:
 
 class LinesFactory:
 
-    __lineFactory = LineFactory()
-
+    def __init__(self):
+        self.__lineFactory = LineFactory()
+            
     def build(self, data):
         # Define result
         #

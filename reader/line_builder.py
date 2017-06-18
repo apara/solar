@@ -4,47 +4,45 @@ from reader import Line, emptyLine, Line130, Line140
 
 
 class LineBuilder:
-    def __init__(self, key: str) -> None:
-        super().__init__()
+    def __init__(self, key):
         self.__key = key
 
     @property
-    def key(self) -> str:
+    def key(self):
         return self.__key
 
-    def can_build(self, key: str) -> bool:
+    def can_build(self, key):
         return self.key == key
 
-    def build(self, array) -> Line:
+    def build(self, array):
         return emptyLine
 
 
 class LineBuilder130(LineBuilder):
     KEY = '130'
 
-    def __init__(self) -> None:
-        super().__init__(self.KEY)
+    def __init__(self):
+        LineBuilder.__init__(self, self.KEY)
 
-    def build(self, array) -> Line:
+    def build(self, array):
         return Line130(None, array) if self.can_build(array[0]) else emptyLine
 
 
 class LineBuilder140(LineBuilder):
     KEY = '140'
 
-    def __init__(self) -> None:
-        super().__init__(self.KEY)
+    def __init__(self):
+        LineBuilder.__init__(self, self.KEY)
 
-    def build(self, array) -> Line:
+    def build(self, array):
         return Line140(None, array) if self.can_build(array[0]) else emptyLine
 
 
 class LineFactory:
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self):
         self.__builders = [LineBuilder130(), LineBuilder140()]
 
-    def build(self, value: str) -> Line:
+    def build(self, value):
         # Define empty result
         #
         result = emptyLine
@@ -83,10 +81,7 @@ class LinesFactory:
 
     __lineFactory = LineFactory()
 
-    def __init__(self) -> None:
-        super().__init__()
-
-    def build(self, data :str):
+    def build(self, data):
         # Define result
         #
         result = []

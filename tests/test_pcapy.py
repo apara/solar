@@ -8,7 +8,7 @@ class TestCapture(unittest.TestCase):
         pc = pcapy.open_live('eth0', 65535, True, 1000)
         # pc.setfilter('tcp')
         pc.setfilter("ip && tcp && dst net %s && dst port 80" % '204.194.111.66')
-        pc.loop(-1, self.recv_pkts)  # capture packets
+        # pc.loop(-1, self.recv_pkts)  # capture packets
 
     def recv_pkts(self, hdr, data):
         packet = EthDecoder().decode(data)

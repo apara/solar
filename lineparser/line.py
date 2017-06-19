@@ -6,22 +6,12 @@ class LineId(str):
         str.__init__(value)
 
 
-# Line base class
-#
-def print_array(array):
-    pass
-
-
 class Line:
 
     def __init__(self, lid=None, array=None):
         # Assign id of the line
         #
         self.id = lid
-
-        # Print out the contents of the array
-        #
-        # print(array)
 
         # Assign type of the line
         #
@@ -87,6 +77,7 @@ class Line130(Line):
             self.pv('inverter_temp_f') + \
             self.pv('avg_op_frequency_hz') + \
             self.pv('unknown')
+
 
 # Type 140
 #

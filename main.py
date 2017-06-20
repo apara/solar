@@ -22,7 +22,7 @@ class DataCapture:
     def run(self):
         # Open live capture onto the network interface in promiscious mode
         #
-        pc = pcapy.open_live(self.__config.network_interface, 65535, True, 0)
+        pc = pcapy.open_live(self.__config.network_interface, 65535, True, 1000)
 
         # Configure the filter
         #

@@ -1,4 +1,5 @@
 import logging
+from utils import *
 
 from lineparser import empty_line, Line130, Line140
 
@@ -38,7 +39,8 @@ class LineBuilder140(LineBuilder):
         return Line140(None, array) if self.can_build(array[0]) else empty_line
 
 
-class LineFactory:
+class LineFactory(LogMixin):
+
     def __init__(self):
         self.__builders = [LineBuilder130(), LineBuilder140()]
 
@@ -58,9 +60,12 @@ class LineFactory:
             #
             for builder in self.__builders:
 
-                # Attempt to build a line
+                # Attempt to build a line, if there are any exceptions skip this line
                 #
-                result = builder.build(array)
+                try:
+                    result = builder.build(array)
+                except Exception as e:
+                    self.logger.warn("Exception while trying to read the line: {0}".format(e))
 
                 # If we have a line, then break out of the loop
                 #
@@ -70,7 +75,7 @@ class LineFactory:
         # Log lines we could not parse
         #
         if result is empty_line:
-            logging.info('%s not parsed', value)
+            self.logger.debug('NOT PARSED: {0}'.format(value))
 
         # Return result
         #

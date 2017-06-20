@@ -3,9 +3,10 @@ import pcapy
 from configuration import Configuration
 from impacket.ImpactDecoder import *
 from lineparser import LinesFactory, Line
+from utils import LogMixin
 
 
-class DataCapture:
+class DataCapture(LogMixin):
     def __init__(self, config_file_names):
         # Create configuration
         #
@@ -50,7 +51,7 @@ class DataCapture:
             # if there is anything in the buffer, then process it, otherwise nothing to see here
             #
             if len(self.__buffer) > 0:
-                print("PROCESSING (%i): [%s]" % (len(self.__buffer), self.__buffer))
+                self.logger.info("PROCESSING (%i): [%s]" % (len(self.__buffer), self.__buffer))
 
                 # Create lines for results
                 #
@@ -63,7 +64,7 @@ class DataCapture:
                 # Dump some debug for now
                 #
                 for l in results:
-                    print(l)
+                    self.logger.debug(l)
             else:
                 pass
         else:
@@ -73,6 +74,15 @@ class DataCapture:
 
 
 def main():
+
+    import logging
+    logging.basicConfig(
+        # filename='output.txt',
+        format='%(asctime)s|%(levelname)s|%(message)s|',
+        datefmt='%m/%d/%Y %I:%M:%S %p',
+        level=logging.INFO
+    )
+    
     return DataCapture(['./solar.conf', 'conf/solar.conf', '/etc/solar.conf']).run()
 
 

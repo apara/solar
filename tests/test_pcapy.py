@@ -5,7 +5,8 @@ from impacket.ImpactDecoder import *
 
 class TestCapture(unittest.TestCase):
     def test_list_interfaces(self):
-        pc = pcapy.open_live('eth0', 65535, True, 1000)
+        # pc = pcapy.open_live('eth0', 65535, True, 1000)
+        pc = pcapy.open_live('en0', 65535, True, 1000)
         # pc.setfilter('tcp')
         pc.setfilter("ip && tcp && dst net %s && dst port 80" % '204.194.111.66')
         # pc.loop(-1, self.recv_pkts)  # capture packets

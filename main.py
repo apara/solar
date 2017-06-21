@@ -2,7 +2,7 @@ import sys
 import pcapy
 from configuration import Configuration
 from impacket.ImpactDecoder import *
-from lineparser import LinesFactory, Line
+from line import LinesFactory, Line
 from utils import LogMixin
 
 
@@ -74,6 +74,9 @@ class DataCapture(LogMixin):
 
 
 def main():
+
+    ifs = pcapy.findalldevs()
+    print(ifs)
 
     import logging
     logging.basicConfig(

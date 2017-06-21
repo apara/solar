@@ -1,7 +1,5 @@
-import logging
 from utils import *
-
-from lineparser import empty_line, Line130, Line140
+from line import empty_line, Line130, Line140
 
 
 class LineBuilder:

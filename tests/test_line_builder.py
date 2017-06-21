@@ -1,7 +1,7 @@
 import unittest
 
-from lineparser.line import *
-from lineparser.line_builder import LinesFactory, LineFactory, LineBuilder130, LineBuilder140
+from line.line import *
+from line.line_builder import LinesFactory, LineFactory, LineBuilder130, LineBuilder140
 
 data_130 = '130	20170607165000	414051708000326	AC_Module_Type_C		2.6567	0.1372	250.4849	0.6821	0.1425	56.1571	2.8915	32	60.0186	0'
 data_array_130 = data_130.split()

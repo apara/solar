@@ -1,4 +1,6 @@
 from datetime import datetime
+from sqlalchemy import *
+from sqlalchemy.orm import *
 
 
 class LineId(str):
@@ -84,5 +86,36 @@ class Line130(Line):
 class Line140(Line):
     def __init__(self, lid=None, array=None):
         Line.__init__(self, lid, array)
+
+
+
+metadata = MetaData()
+
+# Define line table
+#
+lineTable = Table(
+    'line',
+    metadata,
+    Column('id', Integer, primary_key=True, autoincrement="auto"),
+    Column('type', Integer, nullable=False),
+    Column('ts', DateTime, nullable=False),
+    Column('serial', String, nullable=False),
+    Column('description', String, nullable=False),
+    Column('total_lifetime_energy_kwh', Float, nullable=False),
+    Column('avg_ac_power_kw', Float),
+    Column('avg_ac_voltage_v', Float),
+    Column('avg_ac_current_a', Float),
+    Column('avg_dc_power_kw', Float),
+    Column('avg_dc_voltage_v', Float),
+    Column('avg_dc_current_a', Float),
+    Column('inverter_temp_c', Float),
+    Column('avg_op_frequency_hz', Float),
+    Column('unknown', String),
+    Column('inverter_temp_f', Float),
+)
+
+# Add index
+#
+Index('idx_line_type_ts_serial', lineTable.c.type, lineTable.c.serial, lineTable.c.ts, unique=True)
 
 

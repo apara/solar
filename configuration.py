@@ -46,6 +46,21 @@ class Configuration:
     def network_interface(self):
         return self['network_interface']
 
+    @property
+    def db_user(self):
+        return self['db_user']
+
+    @property
+    def db_password(self):
+        return self['db_password']
+
+    @property
+    def db_host(self):
+        return self['db_host']
+
+    @property
+    def db_name(self):
+        return self['db_name']
 
     def __getitem__(self, property_name):
         # Get the value
@@ -55,8 +70,3 @@ class Configuration:
         # Return the value of the property
         #
         return value
-
-
-
-
-

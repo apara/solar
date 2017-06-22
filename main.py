@@ -2,7 +2,7 @@ import sys
 import pcapy
 from configuration import Configuration
 from impacket.ImpactDecoder import *
-from line import LinesFactory, Line
+from line import LinesFactory, Line, DbLineManager
 from utils import LogMixin
 
 
@@ -19,6 +19,10 @@ class DataCapture(LogMixin):
         # Create a data buffer
         #
         self.__buffer = ''
+
+        # Create database manager
+        #
+        self.__dbLineManager = DbLineManager(self.__config)
 
     def run(self):
         # Open live capture onto the network interface in promiscious mode

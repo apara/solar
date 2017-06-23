@@ -21,7 +21,7 @@ class Line:
             self.ts = self.parse_date(array[1])
             self.serial = array[2]
             self.description = array[3]
-            self.total_lifetime_energy_kwh = array[4]
+            self.total_lifetime_energy_kwh = float(array[4])
 
     def __str__(self):
         return \

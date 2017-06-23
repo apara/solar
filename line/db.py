@@ -19,14 +19,15 @@ class DbLine(DbLineBase):
     serial = Column('serial', String(64), nullable=False)
     description = Column('description', String(255), nullable=False)
     total_lifetime_energy_kwh = Column('total_lifetime_energy_kwh', Float, nullable=False)
+    total_lifetime_energy_delta_kwh = Column('total_lifetime_energy_delta_kwh', Float)
 
     __mapper_args__ = {
         'polymorphic_on': type,
-        'polymorphic_identity': '0'
+        # 'polymorphic_identity': '0'
     }
 
     __table_args__ = (
-        Index('idx_ln_serial_ts', serial, ts),
+        UniqueConstraint(serial, ts),
     )
 
     def from_line(self, line):
@@ -43,6 +44,23 @@ class DbLine(DbLineBase):
         return self
 
     def insert(self, session):
+        # Find previous entity, if any
+        #
+        previous_line = \
+            session\
+                .query(DbLine)\
+                .filter(DbLine.serial == self.serial)\
+                .order_by(DbLine.ts.desc())\
+                .one_or_none()
+
+        # If we have a previous line, then configure to the difference, otherwise it is what it is
+        #
+        self.total_lifetime_energy_delta_kwh = \
+            self.total_lifetime_energy_kwh - previous_line.total_lifetime_energy_kwh \
+            if previous_line else self.total_lifetime_energy_kwh
+
+        # Add us to the session
+        #
         session.add(self)
 
 
@@ -83,6 +101,12 @@ class DbLine130(DbLine):
         # Return self
         #
         return self
+
+    def insert(self, session):
+
+        # Insert as normal
+        #
+        super(DbLine130, self).insert(session)
 
 
 # Db Line Type 140

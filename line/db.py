@@ -47,10 +47,11 @@ class DbLine(DbLineBase):
         # Find previous entity, if any
         #
         previous_line = \
-            session\
-                .query(DbLine)\
-                .filter(DbLine.serial == self.serial)\
-                .order_by(DbLine.ts.desc())\
+            session \
+                .query(DbLine) \
+                .filter(DbLine.serial == self.serial) \
+                .order_by(DbLine.ts.desc()) \
+                .limit(1) \
                 .one_or_none()
 
         # If we have a previous line, then configure to the difference, otherwise it is what it is

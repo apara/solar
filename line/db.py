@@ -157,6 +157,8 @@ class DbLineManager:
             session = self.__Session()
             line.to_dbline().insert(session)
             session.commit()
+        except:
+            session.rollback()
         finally:
             session.close()
 

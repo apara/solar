@@ -14,6 +14,12 @@ class LineBuilder:
         return self.key == key
 
     def build(self, array):
+        return \
+            self.new_line(array) \
+            if self.can_build(array[0]) \
+            else empty_line
+
+    def new_line(self, array=None):
         return empty_line
 
 
@@ -23,8 +29,8 @@ class LineBuilder130(LineBuilder):
     def __init__(self):
         LineBuilder.__init__(self, self.KEY)
 
-    def build(self, array):
-        return Line130(None, array) if self.can_build(array[0]) else empty_line
+    def new_line(self, array=None):
+        return Line130(None, array)
 
 
 class LineBuilder140(LineBuilder):
@@ -33,8 +39,8 @@ class LineBuilder140(LineBuilder):
     def __init__(self):
         LineBuilder.__init__(self, self.KEY)
 
-    def build(self, array):
-        return Line140(None, array) if self.can_build(array[0]) else empty_line
+    def new_line(self, array=None):
+        return Line140(None, array)
 
 
 class LineFactory(LogMixin):

@@ -1,6 +1,5 @@
 from datetime import datetime
-from sqlalchemy import *
-from sqlalchemy.orm import *
+from .db import *
 
 
 class LineId(str):
@@ -18,7 +17,7 @@ class Line:
         # Assign type of the line
         #
         if array:
-            self.type = array[0]
+            self.type = int(array[0])
             self.ts = self.parse_date(array[1])
             self.serial = array[2]
             self.description = array[3]
@@ -43,6 +42,9 @@ class Line:
     def vn(self, attribute_name):
         value = getattr(self, attribute_name)
         return str(value) if value else 'None'
+
+    def to_dbline(self):
+        return DbLine().from_line(self)
 
 
 empty_line = Line()
@@ -80,6 +82,9 @@ class Line130(Line):
             self.pv('avg_op_frequency_hz') + \
             self.pv('unknown')
 
+    def to_dbline(self):
+        return DbLine130().from_line(self)
+
 
 # Type 140
 #
@@ -87,35 +92,6 @@ class Line140(Line):
     def __init__(self, lid=None, array=None):
         Line.__init__(self, lid, array)
 
-
-
-metadata = MetaData()
-
-# Define line table
-#
-lineTable = Table(
-    'line',
-    metadata,
-    Column('id', Integer, primary_key=True, autoincrement="auto"),
-    Column('type', Integer, nullable=False),
-    Column('ts', DateTime, nullable=False),
-    Column('serial', String, nullable=False),
-    Column('description', String, nullable=False),
-    Column('total_lifetime_energy_kwh', Float, nullable=False),
-    Column('avg_ac_power_kw', Float),
-    Column('avg_ac_voltage_v', Float),
-    Column('avg_ac_current_a', Float),
-    Column('avg_dc_power_kw', Float),
-    Column('avg_dc_voltage_v', Float),
-    Column('avg_dc_current_a', Float),
-    Column('inverter_temp_c', Float),
-    Column('avg_op_frequency_hz', Float),
-    Column('unknown', String),
-    Column('inverter_temp_f', Float),
-)
-
-# Add index
-#
-Index('idx_line_type_ts_serial', lineTable.c.type, lineTable.c.serial, lineTable.c.ts, unique=True)
-
+    def to_dbline(self):
+        return DbLine140().from_line(self)
 

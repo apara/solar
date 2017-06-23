@@ -65,10 +65,10 @@ class DataCapture(LogMixin):
                 #
                 self.__buffer = ''
 
-                # Dump some debug for now
+                # Insert into database
                 #
                 for l in results:
-                    self.logger.debug(l)
+                    self.__dbLineManager.insert(l)
             else:
                 pass
         else:

@@ -1,6 +1,6 @@
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
-from configuration import Configuration
+from sqlalchemy.orm import sessionmaker
 
 
 # Create a declarative base class
@@ -25,6 +25,26 @@ class DbLine(DbLineBase):
         'polymorphic_identity': '0'
     }
 
+    __table_args__ = (
+        Index('idx_ln_serial_ts', serial, ts),
+    )
+
+    def from_line(self, line):
+        # Configure common parameters
+        # 
+        self.type = line.type
+        self.ts = line.ts
+        self.serial = line.serial
+        self.description = line.description
+        self.total_lifetime_energy_kwh = line.total_lifetime_energy_kwh
+
+        # Return self
+        #
+        return self
+
+    def insert(self, session):
+        session.add(self)
+
 
 # Db Line Type 130
 #
@@ -44,6 +64,26 @@ class DbLine130(DbLine):
         'polymorphic_identity': 130
     }
 
+    def from_line(self, line):
+        super(DbLine130, self).from_line(line)
+        
+        # Configure parameters
+        #
+        self.avg_ac_power_kw = line.avg_ac_power_kw
+        self.avg_ac_voltage_v = line.avg_ac_voltage_v
+        self.avg_ac_current_a = line.avg_ac_current_a
+        self.avg_dc_power_kw = line.avg_dc_power_kw
+        self.avg_dc_voltage_v = line.avg_dc_voltage_v
+        self.avg_dc_current_a = line.avg_dc_current_a
+        self.inverter_temp_c = line.inverter_temp_c
+        self.avg_op_frequency_hz = line.avg_op_frequency_hz
+        self.unknown = line.unknown
+        self.inverter_temp_f = line.inverter_temp_f
+
+        # Return self
+        #
+        return self
+
 
 # Db Line Type 140
 #
@@ -52,6 +92,13 @@ class DbLine140(DbLine):
     __mapper_args__ = {
         'polymorphic_identity': 140
     }
+
+    def from_line(self, line):
+        super(DbLine140, self).from_line(line)
+
+        # Return self
+        #
+        return self
 
 
 class DbLineManager:
@@ -68,9 +115,26 @@ class DbLineManager:
                 )
             )
 
+        # Create a session
+        #
+        self.__Session = sessionmaker(bind=self.__engine)
+
         # Create the schema, if needed
         #
         DbLineBase.metadata.create_all(self.__engine)
+
+    def insert(self, line):
+        # Create a new session
+        #
+        session = None
+
+        try:
+            session = self.__Session()
+            line.to_dbline().insert(session)
+            session.commit()
+        finally:
+            session.close()
+
 
         
 

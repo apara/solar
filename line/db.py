@@ -15,7 +15,7 @@ class DbLine(DbLineBase):
 
     id = Column('id', Integer, primary_key=True, autoincrement="auto")
     type = Column('type', Integer, nullable=False)
-    ts = Column('ts', DateTime, nullable=False)
+    ts = Column('ts', DateTime(timezone=True), nullable=False)
     serial = Column('serial', String(64), nullable=False)
     description = Column('description', String(255), nullable=False)
     total_lifetime_energy_kwh = Column('total_lifetime_energy_kwh', Float, nullable=False)
@@ -157,8 +157,9 @@ class DbLineManager:
             session = self.__Session()
             line.to_dbline().insert(session)
             session.commit()
-        except:
+        except Exception as e:
             session.rollback()
+            print e
         finally:
             session.close()
 

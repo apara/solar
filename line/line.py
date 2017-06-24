@@ -1,5 +1,6 @@
 from datetime import datetime
 from .db import *
+from pytz import UTC
 
 
 class LineId(str):
@@ -34,7 +35,7 @@ class Line:
 
     @staticmethod
     def parse_date(value):
-        return datetime.strptime(value, '%Y%m%d%H%M%S')
+        return datetime.strptime(value, '%Y%m%d%H%M%S').replace(tzinfo=UTC)
 
     def pv(self, attribute_name):
         return ' ' + attribute_name + ': ' + self.vn(attribute_name)

@@ -13,6 +13,12 @@ data_130_invalid = '130	20170607165000	414051708000326	AC_Module_Type_C		2.6567	
 data_array_130_invalid = data_130_invalid.split()
 
 
+class TestGeneral(unittest.TestCase):
+    def test_parse_date(self):
+        ts = Line.parse_date('20170607165000')
+        print "TS : " + str(ts)
+
+
 class TestLineBuilder130(unittest.TestCase):
 
     def test_build(self):

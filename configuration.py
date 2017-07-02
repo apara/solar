@@ -33,18 +33,9 @@ class Configuration:
         #
         return config["defaults"]
 
-    # Return address of the collector that we should be watching, 204.194.111.66 for example for
-    # collector.sunpowermonitor.com
-    #
     @property
-    def collector_ip_address(self):
-        return self['collector_ip_address']
-
-    # Return the network interface that we are going to monitor
-    #
-    @property
-    def network_interface(self):
-        return self['network_interface']
+    def devices_url(self):
+        return self['devices_url']
 
     @property
     def db_user(self):

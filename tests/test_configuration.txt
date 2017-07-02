@@ -1,5 +1,4 @@
 [defaults]
 propertyA=A
 propertyB=B
-collector_ip_address=204.194.111.66
-network_interface=eth0
+devices_url=devices_url

@@ -16,65 +16,23 @@ class DataCapture(LogMixin):
         #
         self.__lines_factory = LinesFactory()
 
-        # Create a data buffer
-        #
-        self.__buffer = ''
-
         # Create database manager
         #
         self.__dbLineManager = DbLineManager(self.__config)
 
     def run(self):
-        # Open live capture onto the network interface in promiscious mode
-        #
-        pc = pcapy.open_live(self.__config.network_interface, 65535, True, 1000)
-
-        # Configure the filter
-        #
-        pc.setfilter("tcp && ip && dst net %s && dst port 80" % '204.194.111.66')
-
-        # Begin packet capture loop
-        #
-        pc.loop(-1, self.__receive_packets)  # capture packets
-
+        
         return 0
 
-    def __receive_packets(self, hdr, data):
-        # Decode the data
+    def __insert_results(self, data):
+        # Create lines for results
         #
-        packet = EthDecoder().decode(data)
-        ip = packet.child()
-        tcp = ip.child()
-        data = tcp.get_data_as_string()
+        results = self.__lines_factory.build(data)
 
-        # print("DATA (%i): [%s]" % (len(data), data))
-
-        # If this is a blank line, then we got the entire request
+        # Insert into database
         #
-        if len(data) == 0:
-            # if there is anything in the buffer, then process it, otherwise nothing to see here
-            #
-            if len(self.__buffer) > 0:
-                self.logger.info("PROCESSING (%i): [%s]" % (len(self.__buffer), self.__buffer))
-
-                # Create lines for results
-                #
-                results = self.__lines_factory.build(self.__buffer)
-
-                # Clear out the buffer
-                #
-                self.__buffer = ''
-
-                # Insert into database
-                #
-                for l in results:
-                    self.__dbLineManager.insert(l)
-            else:
-                pass
-        else:
-            # Otherwise, append this data to the buffer
-            #
-            self.__buffer += data
+        for l in results:
+            self.__dbLineManager.insert(l)
 
 
 def main():

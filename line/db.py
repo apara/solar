@@ -1,4 +1,6 @@
+from utils import LogMixin
 from sqlalchemy import *
+from sqlalchemy.exc import IntegrityError, DatabaseError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -126,7 +128,7 @@ class DbLine140(DbLine):
         return self
 
 
-class DbLineManager:
+class DbLineManager(LogMixin):
     def __init__(self, configuration):
         # Create the engine
         #
@@ -157,9 +159,11 @@ class DbLineManager:
             session = self.__Session()
             line.to_dbline().insert(session)
             session.commit()
-        except Exception as e:
+        except IntegrityError as e:
             session.rollback()
-            print e
+        except DatabaseError as e:
+            session.rollback()
+            self.logger.exception("Unexpected DB exception: {}", e)
         finally:
             session.close()
 

@@ -1,8 +1,8 @@
 import sys
-import pcapy
+import time
+from httplib import HTTPConnection, OK
 from configuration import Configuration
-from impacket.ImpactDecoder import *
-from line import LinesFactory, Line, DbLineManager
+from line import LinesFactory, DbLineManager
 from utils import LogMixin
 
 
@@ -21,8 +21,56 @@ class DataCapture(LogMixin):
         self.__dbLineManager = DbLineManager(self.__config)
 
     def run(self):
-        
-        return 0
+        run = 0
+
+        # Run while we can
+        #
+        while True:
+            # Increment run
+            run += 1
+
+            # Read data
+            #
+            data = self.__read_data()
+
+            # If we got something, insert it
+            #
+            if data is not None:
+                self.__insert_results(data)
+
+            self.logger.info("Run: %s, Length: %s", run, len(data))
+
+            # Sleep for a bit
+            #
+            time.sleep(self.__config.pull_frequency_seconds)
+
+    def __read_data(self):
+        # Initialize connection
+        #
+        connection = None
+
+        # Read the data from connection
+        #
+        try:
+            # Create connection
+            #
+            connection = HTTPConnection(self.__config.devices_host)
+
+            # Execute the request
+            #
+            connection.request('GET', self.__config.devices_url)
+
+            # Get the status
+            #
+            response = connection.getresponse()
+
+            # If the response is good, then proceed
+            #
+            return response.read() if response.status == OK else None
+
+        finally:
+            if connection is not None:
+                connection.close()
 
     def __insert_results(self, data):
         # Create lines for results
@@ -36,10 +84,6 @@ class DataCapture(LogMixin):
 
 
 def main():
-
-    ifs = pcapy.findalldevs()
-    print(ifs)
-
     import logging
     logging.basicConfig(
         # filename='output.txt',

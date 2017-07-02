@@ -34,8 +34,16 @@ class Configuration:
         return config["defaults"]
 
     @property
+    def devices_host(self):
+        return self['devices_host']
+
+    @property
     def devices_url(self):
         return self['devices_url']
+
+    @property
+    def pull_frequency_seconds(self):
+        return float(self['pull_frequency_seconds'])
 
     @property
     def db_user(self):

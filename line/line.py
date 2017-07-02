@@ -98,6 +98,9 @@ class Line140(Line):
         Line.__init__(self, lid, device)
         self.type = 140
 
+        if device:
+            self.total_lifetime_energy_kwh = 0
+
     def to_dbline(self):
         return DbLine140().from_line(self)
 

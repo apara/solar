@@ -43,6 +43,18 @@ class LineBuilder140(LineBuilder):
     def new_line(self, device=None):
         return Line140(None, device)
 
+    # Avoid non-functioning monitor
+    #
+    def can_build(self, device):
+        return \
+            LineBuilder.can_build(self, device) and \
+            not (
+                device['p_3phsum_kw'] == '0' and
+                device['q_3phsum_kvar'] == '0' and
+                device['s_3phsum_kva'] == '0' and
+                device['tot_pf_rto'] == '1'
+            )
+
 
 class LineFactory(LogMixin):
 
@@ -113,7 +125,7 @@ class LinesFactory(LogMixin):
                         result.append(line)
                         
         except Exception as e:
-            self.logger.exception('Could not decode [%s] due to exception', data, e)
+            self.logger.exception('Could not decode [%s] due to exception: %s', data, e)
 
         # Return the lines we have built
         #

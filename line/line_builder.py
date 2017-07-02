@@ -1,3 +1,4 @@
+import json
 from utils import *
 from line import empty_line, Line130, Line140
 
@@ -10,37 +11,37 @@ class LineBuilder:
     def key(self):
         return self.__key
 
-    def can_build(self, key):
-        return self.key == key
+    def can_build(self, device):
+        return self.key == device['DEVICE_TYPE']
 
-    def build(self, array):
+    def build(self, device):
         return \
-            self.new_line(array) \
-            if self.can_build(array[0]) \
+            self.new_line(device) \
+            if self.can_build(device) \
             else empty_line
 
-    def new_line(self, array=None):
+    def new_line(self, device=None):
         return empty_line
 
 
 class LineBuilder130(LineBuilder):
-    KEY = '130'
+    KEY = 'Inverter'
 
     def __init__(self):
         LineBuilder.__init__(self, self.KEY)
 
-    def new_line(self, array=None):
-        return Line130(None, array)
+    def new_line(self, device=None):
+        return Line130(None, device)
 
 
 class LineBuilder140(LineBuilder):
-    KEY = '140'
+    KEY = 'Power Meter'
 
     def __init__(self):
         LineBuilder.__init__(self, self.KEY)
 
-    def new_line(self, array=None):
-        return Line140(None, array)
+    def new_line(self, device=None):
+        return Line140(None, device)
 
 
 class LineFactory(LogMixin):
@@ -48,38 +49,31 @@ class LineFactory(LogMixin):
     def __init__(self):
         self.__builders = [LineBuilder130(), LineBuilder140()]
 
-    def build(self, value):
+    def build(self, device):
         # Define empty result
         #
         result = empty_line
 
-        # Split the line into parts
+        # For each builder try to create a line
         #
-        array = value.split()
+        for builder in self.__builders:
 
-        # If there is anything in array
-        #
-        if array:
-            # For each builder try to create a line
+            # Attempt to build a line, if there are any exceptions skip this line
             #
-            for builder in self.__builders:
+            try:
+                result = builder.build(device)
+            except Exception as e:
+                self.logger.warn("Exception while trying to read device: {0}".format(e))
 
-                # Attempt to build a line, if there are any exceptions skip this line
-                #
-                try:
-                    result = builder.build(array)
-                except Exception as e:
-                    self.logger.warn("Exception while trying to read the line: {0}".format(e))
-
-                # If we have a line, then break out of the loop
-                #
-                if result is not empty_line:
-                    break
+            # If we have a line, then break out of the loop
+            #
+            if result is not empty_line:
+                break
 
         # Log lines we could not parse
         #
         if result is empty_line:
-            self.logger.debug('NOT PARSED: {0}'.format(value))
+            self.logger.debug('NOT PARSED: {0}'.format(device))
 
         # Return result
         #
@@ -96,16 +90,19 @@ class LinesFactory:
         #
         result = []
 
-        # Split the lines on end of line
+        # Parse data into JSON
         #
-        lines = data.split('\n')
+        parsed = json.loads(data)
 
-        # For each line, build a line and add to the array
+        # Make sure it's a succeed
         #
-        for line in lines:
-            line = self.__lineFactory.build(line)
-            if line is not empty_line:
-                result.append(line)
+        if parsed['result'] == 'succeed':
+            # For each device
+            #
+            for device in parsed['devices']:
+                line = self.__lineFactory.build(device)
+                if line is not empty_line:
+                    result.append(line)
 
         # Return the lines we have built
         #

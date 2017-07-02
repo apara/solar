@@ -99,7 +99,7 @@ class Line140(Line):
         self.type = 140
 
         if device:
-            self.total_lifetime_energy_kwh = 0
+            self.total_lifetime_energy_kwh = float(device['net_ltea_3phsum_kwh'])
 
     def to_dbline(self):
         return DbLine140().from_line(self)

@@ -24,7 +24,6 @@ class DataCapture(LogMixin):
         # Init
         #
         run = 0
-        last_data = ''
 
         # Run while we can
         #
@@ -38,13 +37,14 @@ class DataCapture(LogMixin):
 
             # If we got something, insert it
             #
-            if (data is not None) and (data != last_data):
-                last_data = data
+            if data is not None:
                 total_inserts = self.__insert_results(data)
                 action = 'Processed ({} rows)'.format(total_inserts)
             else:
-                action = 'Skipped'
+                action = 'Skipped, unable to read data'
 
+            # Log info processing message
+            #
             self.logger.info("Run: %s, Length: %s, Action: %s", run, len(data), action)
 
             # Sleep for a bit

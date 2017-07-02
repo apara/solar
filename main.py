@@ -40,8 +40,8 @@ class DataCapture(LogMixin):
             #
             if (data is not None) and (data != last_data):
                 last_data = data
-                self.__insert_results(data)
-                action = 'Processed'
+                total_inserts = self.__insert_results(data)
+                action = 'Processed ({} rows)'.format(total_inserts)
             else:
                 action = 'Skipped'
 
@@ -84,10 +84,19 @@ class DataCapture(LogMixin):
         #
         results = self.__lines_factory.build(data)
 
+        # Total insert counter
+        #
+        total_inserts = 0
+
         # Insert into database
         #
         for l in results:
-            self.__dbLineManager.insert(l)
+            if self.__dbLineManager.insert(l):
+                total_inserts += 1
+
+        # Return total inserts
+        #
+        return total_inserts
 
     @property
     def db_line_manager(self):

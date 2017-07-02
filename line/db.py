@@ -186,6 +186,8 @@ class DbLineManager(LogMixin):
         DbLineBase.metadata.create_all(self.__engine)
 
     def insert(self, line):
+        result = False
+
         # Create a new session
         #
         session = None
@@ -200,6 +202,10 @@ class DbLineManager(LogMixin):
             if line.to_dbline().insert(session):
                 session.commit()
 
+            # Indicate that insert was done
+            #
+            result = True
+
         except IntegrityError as e:
             session.rollback()
         except DatabaseError as e:
@@ -207,3 +213,7 @@ class DbLineManager(LogMixin):
             self.logger.exception("Unexpected DB exception: {}", e)
         finally:
             session.close()
+
+        # Return result
+        #
+        return result

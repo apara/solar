@@ -1,3 +1,7 @@
+import sqlalchemy.types as types
+
+import pytz
+
 from utils import LogMixin
 from sqlalchemy import *
 from sqlalchemy.exc import IntegrityError, DatabaseError
@@ -10,6 +14,14 @@ from sqlalchemy.orm import sessionmaker
 DbLineBase = declarative_base()
 
 
+class AwareDateTime(types.TypeDecorator):
+
+    impl = types.DateTime
+
+    def process_result_value(self, value, dialect):
+        return value.replace(tzinfo=pytz.utc)
+
+
 # DbLine base class
 #
 class DbLine(DbLineBase):
@@ -17,7 +29,7 @@ class DbLine(DbLineBase):
 
     id = Column('id', Integer, primary_key=True, autoincrement="auto")
     type = Column('type', Integer, nullable=False)
-    ts = Column('ts', DateTime(timezone=True), nullable=False)
+    ts = Column('ts', AwareDateTime, nullable=False)
     serial = Column('serial', String(64), nullable=False)
     description = Column('description', String(255), nullable=False)
     total_lifetime_energy_kwh = Column('total_lifetime_energy_kwh', Float, nullable=False)
@@ -31,6 +43,15 @@ class DbLine(DbLineBase):
     __table_args__ = (
         UniqueConstraint(serial, ts),
     )
+
+    def same_as(self, line):
+        return \
+            self.type == line.type and \
+            self.ts == line.ts and \
+            self.serial == line.serial
+
+    def not_same_as(self, line):
+        return not self.same_as(line)
 
     def from_line(self, line):
         # Configure common parameters
@@ -56,15 +77,29 @@ class DbLine(DbLineBase):
                 .limit(1) \
                 .one_or_none()
 
-        # If we have a previous line, then configure to the difference, otherwise it is what it is
+        # If previous line is the same as this line based on serial and timestamp, then
+        # skip the processing
         #
-        self.total_lifetime_energy_delta_kwh = \
-            self.total_lifetime_energy_kwh - previous_line.total_lifetime_energy_kwh \
-            if previous_line else self.total_lifetime_energy_kwh
+        result = False
 
-        # Add us to the session
+        if self.not_same_as(previous_line):
+            # If we have a previous line, then configure to the difference, otherwise it is what it is
+            #
+            self.total_lifetime_energy_delta_kwh = \
+                self.total_lifetime_energy_kwh - previous_line.total_lifetime_energy_kwh \
+                if previous_line else self.total_lifetime_energy_kwh
+
+            # Add us to the session
+            #
+            session.add(self)
+
+            # Indicate true result
+            #
+            result = True
+
+        # Return result
         #
-        session.add(self)
+        return result
 
 
 # Db Line Type 130
@@ -109,7 +144,7 @@ class DbLine130(DbLine):
 
         # Insert as normal
         #
-        super(DbLine130, self).insert(session)
+        return super(DbLine130, self).insert(session)
 
 
 # Db Line Type 140
@@ -156,9 +191,15 @@ class DbLineManager(LogMixin):
         session = None
 
         try:
+            # Create a new session
+            #
             session = self.__Session()
-            line.to_dbline().insert(session)
-            session.commit()
+
+            # If the line was inserted, then commit
+            #
+            if line.to_dbline().insert(session):
+                session.commit()
+
         except IntegrityError as e:
             session.rollback()
         except DatabaseError as e:
@@ -166,15 +207,3 @@ class DbLineManager(LogMixin):
             self.logger.exception("Unexpected DB exception: {}", e)
         finally:
             session.close()
-
-
-        
-
-        
-        
-
-
-
-
-
-

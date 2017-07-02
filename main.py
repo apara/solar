@@ -2,7 +2,7 @@ import sys
 import time
 from httplib import HTTPConnection, OK
 from configuration import Configuration
-from line import LinesFactory, DbLineManager
+from line import LinesFactory, DbLineManager, Line130
 from utils import LogMixin
 
 
@@ -89,6 +89,10 @@ class DataCapture(LogMixin):
         for l in results:
             self.__dbLineManager.insert(l)
 
+    @property
+    def db_line_manager(self):
+        return self.__dbLineManager
+
 
 def main():
     import logging
@@ -100,6 +104,18 @@ def main():
     )
     
     return DataCapture(['./solar.conf', 'conf/solar.conf', '/etc/solar.conf']).run()
+
+
+def oldmain():
+    import json
+    dc = DataCapture(['./solar.conf', 'conf/solar.conf', '/etc/solar.conf'])
+
+    data_130 = '{"ISDETAIL":"1","SERIAL":"414051706011633","TYPE":"SOLARBRIDGE","STATE":"working","STATEDESCR":"Working","MODEL":"AC_Module_Type_C","DESCR":"Inverter 414051706011633","DEVICE_TYPE":"Inverter","SWVER":"951007408","PORT":"","MOD_SN":"","NMPLT_SKU":"","DATATIME":"2017,07,02,03,05,14","ltea_3phsum_kwh":"58.7856","p_3phsum_kw":"0","vln_3phavg_v":"249.2725","i_3phsum_a":"0","p_mpptsum_kw":"0","v_mppt1_v":"55.5546","i_mppt1_a":"-0.0333","t_htsnk_degc":"26.75","freq_hz":"60.0096","CURTIME":"2017,07,02,03,12,10"}'
+    data_json_130 = json.loads(data_130)
+
+    line = Line130(device=data_json_130)
+
+    dc.db_line_manager.insert(line)
 
 
 if __name__ == "__main__":

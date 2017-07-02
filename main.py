@@ -21,7 +21,10 @@ class DataCapture(LogMixin):
         self.__dbLineManager = DbLineManager(self.__config)
 
     def run(self):
+        # Init
+        #
         run = 0
+        last_data = ''
 
         # Run while we can
         #
@@ -35,10 +38,14 @@ class DataCapture(LogMixin):
 
             # If we got something, insert it
             #
-            if data is not None:
+            if (data is not None) and (data != last_data):
+                last_data = data
                 self.__insert_results(data)
+                action = 'Processed'
+            else:
+                action = 'Skipped'
 
-            self.logger.info("Run: %s, Length: %s", run, len(data))
+            self.logger.info("Run: %s, Length: %s, Action: %s", run, len(data), action)
 
             # Sleep for a bit
             #

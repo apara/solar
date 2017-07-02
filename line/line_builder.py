@@ -80,7 +80,7 @@ class LineFactory(LogMixin):
         return result
 
 
-class LinesFactory:
+class LinesFactory(LogMixin):
 
     def __init__(self):
         self.__lineFactory = LineFactory()
@@ -92,17 +92,28 @@ class LinesFactory:
 
         # Parse data into JSON
         #
-        parsed = json.loads(data)
-
-        # Make sure it's a succeed
-        #
-        if parsed['result'] == 'succeed':
-            # For each device
+        try:
+            # parse json text
             #
-            for device in parsed['devices']:
-                line = self.__lineFactory.build(device)
-                if line is not empty_line:
-                    result.append(line)
+            parsed = json.loads(data)
+
+            # Make sure it's a succeed
+            #
+            if parsed['result'] == 'succeed':
+                # For each device
+                #
+                for device in parsed['devices']:
+                    # Build reporting line
+                    #
+                    line = self.__lineFactory.build(device)
+
+                    # If it's not an empty line
+                    #
+                    if line is not empty_line:
+                        result.append(line)
+                        
+        except Exception as e:
+            self.logger.exception(e)
 
         # Return the lines we have built
         #

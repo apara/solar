@@ -96,11 +96,10 @@ class DbLine(DbLineBase):
             # If we are not the same as the previous line... duplicate read
             #
             if self.not_same_as(previous_line):
-                # If we have a previous line, then configure to the difference, otherwise it is what it is
+                # Configure to the difference
                 #
                 self.total_lifetime_energy_delta_kwh = \
-                    self.total_lifetime_energy_kwh - previous_line.total_lifetime_energy_kwh \
-                    if previous_line else self.total_lifetime_energy_kwh
+                    self.total_lifetime_energy_kwh - previous_line.total_lifetime_energy_kwh
 
                 # Indicate true result
                 #

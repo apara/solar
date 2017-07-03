@@ -125,7 +125,7 @@ class LinesFactory(LogMixin):
                         result.append(line)
                         
         except Exception as e:
-            self.logger.exception('Could not decode [%s] due to exception: %s', data, e)
+            self.logger.warning('Could not decode [%s] due to exception: %s', data, e)
 
         # Return the lines we have built
         #

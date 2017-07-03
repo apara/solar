@@ -82,20 +82,36 @@ class DbLine(DbLineBase):
         #
         result = False
 
-        if self.not_same_as(previous_line):
-            # If we have a previous line, then configure to the difference, otherwise it is what it is
+        # If we are not able to find the previous line
+        #
+        if previous_line is None:
+            # Initialize the total delta to the start
             #
-            self.total_lifetime_energy_delta_kwh = \
-                self.total_lifetime_energy_kwh - previous_line.total_lifetime_energy_kwh \
-                if previous_line else self.total_lifetime_energy_kwh
+            self.total_lifetime_energy_delta_kwh = self.total_lifetime_energy_kwh
 
-            # Add us to the session
-            #
-            session.add(self)
-
-            # Indicate true result
+            # Result is good
             #
             result = True
+        else:
+            # If we are not the same as the previous line... duplicate read
+            #
+            if self.not_same_as(previous_line):
+                # If we have a previous line, then configure to the difference, otherwise it is what it is
+                #
+                self.total_lifetime_energy_delta_kwh = \
+                    self.total_lifetime_energy_kwh - previous_line.total_lifetime_energy_kwh \
+                    if previous_line else self.total_lifetime_energy_kwh
+
+                # Indicate true result
+                #
+                result = True
+            else:
+                pass
+
+        # if result is true, we need to add
+        #
+        if result:
+            session.add(self)
 
         # Return result
         #

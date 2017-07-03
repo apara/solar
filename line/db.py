@@ -216,10 +216,7 @@ class DbLineManager(LogMixin):
             #
             if line.to_dbline().insert(session):
                 session.commit()
-
-            # Indicate that insert was done
-            #
-            result = True
+                result = True
 
         except IntegrityError as e:
             session.rollback()

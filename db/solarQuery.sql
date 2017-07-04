@@ -1,5 +1,21 @@
 SET time_zone = 'America/Los_Angeles';
 
+
+-- Today's usage
+--
+SELECT
+	((select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts > date(now()) order by l.ts desc limit 1) - 
+	(select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts > date(now()) order by l.ts asc limit 1) ) * 0.6885287289;
+
+-- Today's production
+select
+	sum(l.total_lifetime_energy_delta_kwh)
+from
+	line l
+where
+	l.type=130 and
+	l.ts > date(now());
+	
 -- SELECT @@global.time_zone, @@session.time_zone;
 
 

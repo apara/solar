@@ -45,7 +45,7 @@ class DataCapture(LogMixin):
                 time.sleep(self.__config.pull_frequency_seconds)
                 run += 1
             else:
-                self.logger.warn("Run: $s, no parsed data present, retrying", run)
+                self.logger.warn("Run: %s, no parsed data present, retrying", run)
                 time.sleep(1)
 
     def __parse_data(self, data):

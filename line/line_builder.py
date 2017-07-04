@@ -97,7 +97,7 @@ class LinesFactory(LogMixin):
     def __init__(self):
         self.__lineFactory = LineFactory()
             
-    def build(self, data):
+    def build(self, parsed):
         # Define result
         #
         result = []
@@ -105,10 +105,6 @@ class LinesFactory(LogMixin):
         # Parse data into JSON
         #
         try:
-            # parse json text
-            #
-            parsed = json.loads(data)
-
             # Make sure it's a succeed
             #
             if parsed['result'] == 'succeed':

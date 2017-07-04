@@ -1,3 +1,4 @@
+import json
 import sys
 import time
 from httplib import HTTPConnection, OK
@@ -23,33 +24,46 @@ class DataCapture(LogMixin):
     def run(self):
         # Init
         #
-        run = 0
+        run = 1
 
         # Run while we can
         #
         while True:
-            # Increment run
-            run += 1
-
             # Read data
             #
-            data = self.__read_data()
+            data = self.__read_data_with_retry()
 
-            # If we got something, insert it
+            # Parse the data
             #
-            if data is not None:
-                total_inserts = self.__insert_results(data)
-                action = 'Processed ({} rows)'.format(total_inserts)
+            parsed = self.__parse_data(data)
+
+            # If we got something, process it, otherwise try again
+            #
+            if parsed is not None:
+                total_inserts = self.__insert_results(parsed)
+                self.logger.info("Run: %s, Length: %s, Processed %s rows", run, len(data), total_inserts)
+                time.sleep(self.__config.pull_frequency_seconds)
+                run += 1
             else:
-                action = 'Skipped, unable to read data'
+                self.logger.warn("Run: $s, no parsed data present, retrying", run)
+                time.sleep(1)
 
-            # Log info processing message
-            #
-            self.logger.info("Run: %s, Length: %s, Action: %s", run, len(data), action)
+    def __parse_data(self, data):
+        result = None
+        try:
+            result = json.loads(data)
+        except Exception as e:
+            self.logger.warning('Could not decode [%s] due to exception: %s', data, e)
+        return result
 
-            # Sleep for a bit
-            #
-            time.sleep(self.__config.pull_frequency_seconds)
+    def __read_data_with_retry(self):
+        result = None
+        while result is None:
+            result = self.__read_data()
+            if result is None:
+                time.sleep(1)
+
+        return result
 
     def __read_data(self):
         # Initialize connection
@@ -74,7 +88,8 @@ class DataCapture(LogMixin):
             # If the response is good, then proceed
             #
             return response.read() if response.status == OK else None
-
+        except Exception as e:
+            self.logger.warning('Failed to read HTTP due to %s', e)
         finally:
             if connection is not None:
                 connection.close()

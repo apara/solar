@@ -71,7 +71,7 @@ class TestLinesFactory(unittest.TestCase):
 
         with open("tests/test_line_builder.txt", "r") as file:
             data = file.read()
-            results = factory.build(data)
+            results = factory.build(json.loads(data))
             self.assertEqual(len(results), 22)
 
             for l in results:

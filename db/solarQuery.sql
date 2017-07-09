@@ -1,20 +1,98 @@
 SET time_zone = 'America/Los_Angeles';
 
 
--- Today's usage
+SET @DAYS_BACK = 2;
+SET @TS_FROM = DATE_SUB(CURDATE(), INTERVAL @DAYS_BACK day);
+SET @TS_TO = DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL @DAYS_BACK day),"%Y-%m-%d 23:59:59");
+select @DAYS_BACK, @TS_FROM, @TS_TO;
+
+
+-- PROD, USAGE, NET
+--
+select
+	p.production, 
+	p.net, 
+	p.production + p.net as 'usage'
+from
+	(
+		select
+			(
+				select
+					sum(l.total_lifetime_energy_delta_kwh)
+				from
+					line l
+				where
+					l.type=130 and
+					l.ts between @TS_FROM AND @TS_TO
+			) as 'production',
+			(
+				SELECT
+					((select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts between @TS_FROM AND @TS_TO order by l.ts desc limit 1) - 
+					(select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts between @TS_FROM AND @TS_TO order by l.ts asc limit 1) )
+			) as 'net'	
+	) AS p;
+
+
+-- Today's net
 --
 SELECT
-	((select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts > date(now()) order by l.ts desc limit 1) - 
-	(select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts > date(now()) order by l.ts asc limit 1) ) * 0.6885287289;
+	((select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts between @TS_FROM AND @TS_TO order by l.ts desc limit 1) - 
+	(select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts between @TS_FROM AND @TS_TO order by l.ts asc limit 1) );
 
 -- Today's production
+--
 select
 	sum(l.total_lifetime_energy_delta_kwh)
 from
 	line l
 where
 	l.type=130 and
-	l.ts > date(now());
+	l.ts between @TS_FROM AND @TS_TO;
+
+
+select
+	(
+		select
+			sum(l.total_lifetime_energy_delta_kwh) as 'production'
+		from
+			line l
+		where
+			l.type=130 and
+			l.ts between @TS_FROM AND @TS_TO
+	) as 'production',
+	(
+		SELECT
+			((select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts between @TS_FROM AND @TS_TO order by l.ts desc limit 1) - 
+			(select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts between @TS_FROM AND @TS_TO order by l.ts asc limit 1) ) as 'net'
+	) as 'net';		
+
+
+	
+-- PROD, USAGE, NET
+--
+select
+	p.production, 
+	p.net, 
+	p.production + p.net as 'usage'
+from
+	(
+		select
+			(
+				select
+					sum(l.total_lifetime_energy_delta_kwh)
+				from
+					line l
+				where
+					l.type=130 and
+					l.ts between @TS_FROM AND @TS_TO
+			) as 'production',
+			(
+				SELECT
+					((select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts between @TS_FROM AND @TS_TO order by l.ts desc limit 1) - 
+					(select l.total_lifetime_energy_kwh from line l where l.type = 140 and l.ts between @TS_FROM AND @TS_TO order by l.ts asc limit 1) )
+			) as 'net'	
+	) AS p;
+
 	
 -- SELECT @@global.time_zone, @@session.time_zone;
 
